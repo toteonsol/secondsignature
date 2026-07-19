@@ -15,6 +15,7 @@ const {
   FACTORY_ADDRESS,
   ANTHROPIC_API_KEY,
   OPENROUTER_API_KEY,
+  OPENROUTER_MODEL = "anthropic/claude-sonnet-4.5",
   POLL_MS = "3000",
   PORT = "8787",
   // First block worth scanning (the factory's deployment block). Public Monad
@@ -136,7 +137,7 @@ async function llmText(ctx) {
     method: "POST",
     headers: { authorization: `Bearer ${OPENROUTER_API_KEY}`, "content-type": "application/json" },
     body: JSON.stringify({
-      model: "anthropic/claude-sonnet-4.5",
+      model: OPENROUTER_MODEL,
       max_tokens: 400,
       messages: [
         { role: "system", content: GUARDIAN_SYSTEM },

@@ -282,29 +282,17 @@ export default function App() {
               </div>
             </div>
 
-            <div className="card">
-              <div className="label">Propose a withdrawal</div>
-              <input placeholder="Destination address 0x…" value={form.to} onChange={(e) => setForm({ ...form, to: e.target.value })} />
-              <div className="row">
-                <input placeholder="Amount in MON" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
-                <button disabled={!!busy || !form.to || !form.amount} onClick={propose}>
-                  {busy === "propose" ? "Signing…" : "Sign & send to guardian"}
-                </button>
-              </div>
-              <p className="dim small">Your signature is the first one. The guardian looks at the details and decides whether to add the second.</p>
-            </div>
-
             {WC_PROJECT_ID && (
               <div className="card">
-                <div className="label">Use your vault on any dapp <span className="beta">beta</span></div>
+                <div className="label">Before you trust another dapp <span className="beta">beta</span></div>
                 {wcSession ? (
                   <div className="row spread">
-                    <span>Connected to <b>{wcSession}</b></span>
+                    <span>Connected to <b>{wcSession}</b>. Everything it asks for goes past your guardian first.</span>
                     <button className="ghost" onClick={unpairDapps}>Disconnect</button>
                   </div>
                 ) : (
                   <>
-                    <p className="dim small">On the dapp, choose WalletConnect and copy its pairing code, then paste it here. The vault becomes your wallet there, guardian included.</p>
+                    <p className="dim small">This is the heart of it: never sign alone, anywhere. On any dapp, choose WalletConnect, copy its pairing code, and paste it here. The vault becomes your wallet on that dapp, and nothing it asks for can execute until your guardian has read it. Scam mints and dressed-up drains die right here.</p>
                     <div className="row">
                       <input placeholder="wc:…" value={wcUri} onChange={(e) => setWcUri(e.target.value)} />
                       <button disabled={!!busy || !wcUri.trim().startsWith("wc:")} onClick={pairDapp}>
@@ -316,6 +304,18 @@ export default function App() {
                 {wcNote && <p className="small note">{wcNote}</p>}
               </div>
             )}
+
+            <div className="card">
+              <div className="label">Send from the vault</div>
+              <input placeholder="Destination address 0x…" value={form.to} onChange={(e) => setForm({ ...form, to: e.target.value })} />
+              <div className="row">
+                <input placeholder="Amount in MON" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+                <button disabled={!!busy || !form.to || !form.amount} onClick={propose}>
+                  {busy === "propose" ? "Signing…" : "Sign & send to guardian"}
+                </button>
+              </div>
+              <p className="dim small">You sign first, never alone: the guardian reads the destination's history and your own habits, then adds the second signature or argues back.</p>
+            </div>
 
             <div className="card">
               <div className="label">Proposals</div>
