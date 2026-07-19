@@ -45,7 +45,7 @@ I proposed sending 90% of my balance to a fresh address and it objected, in writ
 
 I built Second Signature this weekend for @monad_xyz's Spark hackathon: a vault where an AI co-signs every withdrawal. It can't steal (its signature alone moves nothing) and it can't lock you out (you win after 48h, which is exactly what defeats a thief with your key).
 
-Live on Monad mainnet: secondsignature.vercel.app
+Live on Monad mainnet: secondsignature.web3wikis.com
 
 The wallet that argues back.
 
