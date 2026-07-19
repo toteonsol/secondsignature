@@ -12,6 +12,7 @@ export default function App() {
   const [vault, setVault] = useState(null);
   const [vaultList, setVaultList] = useState([]);
   const [balance, setBalance] = useState(0n);
+  const [walletBalance, setWalletBalance] = useState(0n);
   const [proposals, setProposals] = useState([]);
   const [decisions, setDecisions] = useState([]);
   const [guardianOnline, setGuardianOnline] = useState(null);
@@ -59,6 +60,7 @@ export default function App() {
       setGuardianOnline(false);
     }
     if (!account) return;
+    setWalletBalance(await pub.getBalance({ address: account }));
     const n = Number(await pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "vaultCountOf", args: [account] }));
     if (n === 0) { setVaultList([]); return; }
     const list = await Promise.all(
@@ -302,6 +304,13 @@ export default function App() {
                 <input placeholder="Amount" value={deposit} onChange={(e) => setDeposit(e.target.value)} />
                 <button disabled={!!busy || !deposit} onClick={fund}>Deposit</button>
               </div>
+              <p className="dim small walletbal">
+                In your wallet: {Number(formatEther(walletBalance)).toLocaleString(undefined, { maximumFractionDigits: 4 })} MON
+                <button className="linky" disabled={walletBalance <= parseEther("0.02")}
+                  onClick={() => setDeposit(formatEther(walletBalance > parseEther("0.02") ? walletBalance - parseEther("0.02") : 0n))}>
+                  deposit max
+                </button>
+              </p>
             </div>
 
             {WC_PROJECT_ID && (

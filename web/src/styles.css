@@ -166,3 +166,5 @@ input, button, a { outline-offset: 2px; }
 .vaultbar { justify-content: space-between; }
 .vaultpick { font: inherit; font-size: 12px; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 4px; background: #fffdf7; color: var(--ink); cursor: pointer; }
 .vaultbar button { font-size: 12px; padding: 6px 12px; }
+
+.walletbal { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
