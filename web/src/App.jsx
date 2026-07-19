@@ -20,6 +20,20 @@ export default function App() {
   const [wcUri, setWcUri] = useState("");
   const [wcSession, setWcSession] = useState(null);
   const [wcNote, setWcNote] = useState("");
+  const [landing, setLanding] = useState({ vaults: null, verdicts: null, quote: null });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [vaults, all] = await Promise.all([
+          pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "totalVaults" }),
+          fetch(`${AGENT_URL}/decisions`).then((r) => r.json()),
+        ]);
+        const quote = [...all].reverse().find((d) => !d.approved) ?? all[all.length - 1] ?? null;
+        setLanding({ vaults: Number(vaults), verdicts: all.length, quote });
+      } catch { /* landing works without stats */ }
+    })();
+  }, []);
 
   const [wallet, setWallet] = useState(null);
 
@@ -174,8 +188,26 @@ export default function App() {
               with you or argues back in plain English, before the money moves.
             </p>
             <button onClick={connect}>Connect a wallet to begin</button>
-            <p className="dim small">Works with MetaMask and other browser wallets, live on Monad mainnet.</p>
+            <p className="dim small">Your first vault takes about thirty seconds and costs nothing but gas. Works with MetaMask and other browser wallets, live on Monad mainnet.</p>
+            {landing.vaults !== null && (
+              <div className="stats">
+                <span><b>{landing.vaults}</b> vault{landing.vaults === 1 ? "" : "s"} guarded on Monad mainnet</span>
+                <span className="statdot">·</span>
+                <span><b>{landing.verdicts}</b> verdict{landing.verdicts === 1 ? "" : "s"} delivered, every one on-chain</span>
+              </div>
+            )}
           </section>
+
+          {landing.quote && (
+            <section className="ledger">
+              <div className="label">From the guardian's ledger, Monad mainnet, unedited</div>
+              <blockquote className="bigquote">"{landing.quote.reason}"</blockquote>
+              <p className="dim small">
+                {landing.quote.approved ? "Co-signed" : "The transaction it refused never executed."}{" "}
+                <a className="mono" href={`${EXPLORER}/tx/${landing.quote.tx}`} target="_blank" rel="noreferrer">read it on-chain</a>
+              </p>
+            </section>
+          )}
 
           <section className="explain">
             <div className="card">
