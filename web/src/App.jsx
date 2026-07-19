@@ -10,6 +10,7 @@ const short = (a) => (a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "");
 export default function App() {
   const [account, setAccount] = useState(null);
   const [vault, setVault] = useState(null);
+  const [vaultList, setVaultList] = useState([]);
   const [balance, setBalance] = useState(0n);
   const [proposals, setProposals] = useState([]);
   const [decisions, setDecisions] = useState([]);
@@ -58,14 +59,15 @@ export default function App() {
       setGuardianOnline(false);
     }
     if (!account) return;
-    if (!vault) {
-      const n = await pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "vaultCountOf", args: [account] });
-      if (n > 0n) {
-        const v = await pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "vaultsOf", args: [account, n - 1n] });
-        setVault(v);
-      }
-      return;
-    }
+    const n = Number(await pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "vaultCountOf", args: [account] }));
+    if (n === 0) { setVaultList([]); return; }
+    const list = await Promise.all(
+      Array.from({ length: n }, (_, i) =>
+        pub.readContract({ address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "vaultsOf", args: [account, BigInt(i)] })
+      )
+    );
+    setVaultList(list);
+    if (!vault) { setVault(list[list.length - 1]); return; }
     const [bal, count] = await Promise.all([
       pub.getBalance({ address: vault }),
       pub.readContract({ address: vault, abi: vaultAbi, functionName: "proposalCount" }),
@@ -106,6 +108,14 @@ export default function App() {
     tx("create", () =>
       wallet.writeContract({ account, address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "createVault", args: ["0x0000000000000000000000000000000000000000"] })
     ).then(() => setVault(null));
+
+  const switchVault = (addr) => {
+    if (addr === vault) return;
+    setVault(addr);
+    setBalance(0n);
+    setProposals([]);
+    setDecisions([]);
+  };
 
   const fund = () =>
     tx("fund", () => wallet.sendTransaction({ account, to: vault, value: parseEther(deposit || "0") })).then(() => setDeposit(""));
@@ -275,6 +285,18 @@ export default function App() {
               <div className="label">Vault</div>
               <div className="balance">{Number(formatEther(balance)).toLocaleString(undefined, { maximumFractionDigits: 4 })} <span>MON</span></div>
               <a className="mono dim" href={`${EXPLORER}/address/${vault}`} target="_blank" rel="noreferrer">{vault}</a>
+              <div className="row vaultbar">
+                {vaultList.length > 1 && (
+                  <select className="vaultpick" value={vault ?? ""} onChange={(e) => switchVault(e.target.value)}>
+                    {vaultList.map((v, i) => (
+                      <option key={v} value={v}>Vault {i + 1} · {short(v)}</option>
+                    ))}
+                  </select>
+                )}
+                <button className="ghost" disabled={!!busy} onClick={createVault}>
+                  {busy === "create" ? "Creating…" : "+ New vault"}
+                </button>
+              </div>
               {balance === 0n && <p className="dim small">Step 2 of 2: deposit some MON. Whatever lives in the vault is what the guardian protects.</p>}
               <div className="row">
                 <input placeholder="Amount" value={deposit} onChange={(e) => setDeposit(e.target.value)} />
