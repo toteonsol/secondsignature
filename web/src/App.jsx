@@ -260,7 +260,7 @@ export default function App() {
 
             <div className="card">
               <div className="label">Proposals</div>
-              {proposals.length === 0 && <p className="dim">Nothing yet. Your guardian is watching an empty ledger.</p>}
+              {proposals.length === 0 && <p className="dim">Nothing yet. Propose a withdrawal above and it appears here with the guardian's verdict beside it. Approved ones execute on their own; rejected ones wait for your cancel or your 48 hour override.</p>}
               {proposals.map((p) => (
                 <div key={p.id} className={`proposal s${p.status}`}>
                   <div className="row spread">
@@ -285,7 +285,12 @@ export default function App() {
           <section className="col">
             <div className="card feed">
               <div className="label">The guardian's argument feed</div>
-              {decisions.length === 0 && <p className="dim">When you propose a withdrawal, the guardian's reasoning shows up here. Every word is also recorded on-chain.</p>}
+              {decisions.length === 0 && (
+                <>
+                  <p className="dim">When you propose a withdrawal, the guardian reads the destination's history, the amount against your balance, and the fine print. Its verdict and its exact words show up here, and every word is also recorded on-chain.</p>
+                  <p className="dim small">It learns your normal too: destinations you pay regularly earn more benefit of the doubt.</p>
+                </>
+              )}
               {decisions.map((d) => (
                 <div key={d.id + d.tx} className={`verdict ${d.approved ? "ok" : "no"}`}>
                   <div className="verdict-head">
