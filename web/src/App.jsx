@@ -41,16 +41,33 @@ export default function App() {
 
   const connect = async () => {
     if (!window.ethereum) return alert("No wallet found. Install MetaMask (or any injected wallet).");
-    const wallet = createWalletClient({ chain, transport: custom(window.ethereum) });
-    setWallet(wallet);
-    const [addr] = await wallet.requestAddresses();
+    const w = createWalletClient({ chain, transport: custom(window.ethereum) });
+    setWallet(w);
+    const [addr] = await w.requestAddresses();
+    setAccount(addr); // reflect the connection immediately, before the network prompt
     try {
-      await wallet.switchChain({ id: chain.id });
+      await w.switchChain({ id: chain.id });
     } catch {
-      await wallet.addChain({ chain }).catch(() => {});
+      await w.addChain({ chain }).catch(() => {});
     }
-    setAccount(addr);
   };
+
+  // Silently restore an already-authorized wallet on load, and follow account changes.
+  useEffect(() => {
+    if (!window.ethereum) return;
+    window.ethereum.request({ method: "eth_accounts" }).then((accts) => {
+      if (accts?.length) {
+        setWallet(createWalletClient({ chain, transport: custom(window.ethereum) }));
+        setAccount(accts[0]);
+      }
+    }).catch(() => {});
+    const onAccounts = (accts) => {
+      if (!accts?.length) { setAccount(null); setVault(null); }
+      else setAccount(accts[0]);
+    };
+    window.ethereum.on?.("accountsChanged", onAccounts);
+    return () => window.ethereum.removeListener?.("accountsChanged", onAccounts);
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
