@@ -17,7 +17,12 @@ const {
   OPENROUTER_API_KEY,
   POLL_MS = "3000",
   PORT = "8787",
+  // First block worth scanning (the factory's deployment block). Public Monad
+  // RPCs cap eth_getLogs at 100 blocks per request, so all scans are chunked.
+  START_BLOCK = "0",
 } = process.env;
+
+const LOG_CHUNK = 100n;
 
 if (!GUARDIAN_PRIVATE_KEY || !FACTORY_ADDRESS) {
   console.error("Missing GUARDIAN_PRIVATE_KEY or FACTORY_ADDRESS");
@@ -160,20 +165,33 @@ async function handleProposal(vault, id) {
   }
 }
 
+// Fetch logs in <=100 block chunks to respect public RPC limits.
+async function getLogsChunked(address, event, from, to) {
+  const out = [];
+  for (let a = from; a <= to; a += LOG_CHUNK) {
+    const b = a + LOG_CHUNK - 1n > to ? to : a + LOG_CHUNK - 1n;
+    out.push(...(await pub.getLogs({ address, event, fromBlock: a, toBlock: b })));
+  }
+  return out;
+}
+
+function trackVaultLogs(created) {
+  for (const l of created) {
+    if (l.args.guardian?.toLowerCase() === account.address.toLowerCase()) {
+      if (!vaults.has(l.args.vault)) log("guarding new vault", l.args.vault);
+      vaults.add(l.args.vault);
+    }
+  }
+}
+
 async function poll() {
   try {
     const latest = await pub.getBlockNumber();
-    if (fromBlock === 0n) fromBlock = latest - 100n > 0n ? latest - 100n : 0n;
+    if (fromBlock === 0n) fromBlock = latest - 99n > 0n ? latest - 99n : 0n;
     if (latest < fromBlock) return;
-    const created = await pub.getLogs({ address: FACTORY_ADDRESS, event: vaultCreatedEvent, fromBlock, toBlock: latest });
-    for (const l of created) {
-      if (l.args.guardian?.toLowerCase() === account.address.toLowerCase()) {
-        if (!vaults.has(l.args.vault)) log("guarding new vault", l.args.vault);
-        vaults.add(l.args.vault);
-      }
-    }
+    trackVaultLogs(await getLogsChunked(FACTORY_ADDRESS, vaultCreatedEvent, fromBlock, latest));
     if (vaults.size) {
-      const proposed = await pub.getLogs({ address: [...vaults], event: proposedEvent, fromBlock, toBlock: latest });
+      const proposed = await getLogsChunked([...vaults], proposedEvent, fromBlock, latest);
       for (const l of proposed) handleProposal(l.address, l.args.id);
     }
     fromBlock = latest + 1n;
@@ -185,9 +203,11 @@ async function poll() {
 // Bootstrap: find all pre-existing vaults guarded by us, and any pending proposals.
 async function bootstrap() {
   try {
-    const logs = await pub.getLogs({ address: FACTORY_ADDRESS, event: vaultCreatedEvent, fromBlock: 0n, toBlock: "latest" });
-    for (const l of logs)
-      if (l.args.guardian?.toLowerCase() === account.address.toLowerCase()) vaults.add(l.args.vault);
+    const start = BigInt(START_BLOCK);
+    if (start > 0n) {
+      const latest = await pub.getBlockNumber();
+      trackVaultLogs(await getLogsChunked(FACTORY_ADDRESS, vaultCreatedEvent, start, latest));
+    }
     log(`bootstrapped: guarding ${vaults.size} vault(s)`);
     for (const vault of vaults) {
       const n = await pub.readContract({ address: vault, abi: vaultAbi, functionName: "proposalCount" });
