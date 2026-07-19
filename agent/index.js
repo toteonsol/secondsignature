@@ -14,6 +14,7 @@ const {
   CHAIN_ID = "143",
   FACTORY_ADDRESS,
   ANTHROPIC_API_KEY,
+  OPENROUTER_API_KEY,
   POLL_MS = "3000",
   PORT = "8787",
 } = process.env;
@@ -95,16 +96,40 @@ function heuristicVerdict(ctx) {
   return { approve: true, reason: "Routine transaction: modest fraction of balance, destination has history. Co-signed." };
 }
 
-async function verdictFor(ctx) {
-  if (!anthropic) return heuristicVerdict(ctx);
-  try {
+const GUARDIAN_SYSTEM = `You are the guardian co-signer of a user's crypto vault on Monad. Your ONLY job is to protect the owner from irreversible mistakes: wallet drains, fat-fingered amounts, phishing destinations, panic moves. You cannot steal (your signature alone moves nothing) and you cannot lock the owner out (they can override you after 48h), so be brave about objecting, but don't nag about routine activity. Style rules for the reason: speak directly to the owner in first person, plain warm language a newcomer understands, be concrete about what you saw, 1-3 sentences, and never use em dashes. Respond ONLY with JSON: {"approve": boolean, "reason": "..."}.`;
+
+async function llmText(ctx) {
+  const user = `Proposed transaction context:\n${JSON.stringify(ctx, null, 2)}`;
+  if (anthropic) {
     const msg = await anthropic.messages.create({
       model: "claude-sonnet-5",
       max_tokens: 400,
-      system: `You are the guardian co-signer of a user's crypto vault on Monad. Your ONLY job is to protect the owner from irreversible mistakes: wallet drains, fat-fingered amounts, phishing destinations, panic moves. You cannot steal (your signature alone moves nothing) and you cannot lock the owner out (they can override you after 48h), so be brave about objecting, but don't nag about routine activity. Style rules for the reason: speak directly to the owner in first person, plain warm language a newcomer understands, be concrete about what you saw, 1-3 sentences, and never use em dashes. Respond ONLY with JSON: {"approve": boolean, "reason": "..."}.`,
-      messages: [{ role: "user", content: `Proposed transaction context:\n${JSON.stringify(ctx, null, 2)}` }],
+      system: GUARDIAN_SYSTEM,
+      messages: [{ role: "user", content: user }],
     });
-    const text = msg.content.find((b) => b.type === "text")?.text ?? "";
+    return msg.content.find((b) => b.type === "text")?.text ?? "";
+  }
+  // OpenRouter path (OpenAI-style API)
+  const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: { authorization: `Bearer ${OPENROUTER_API_KEY}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      model: "anthropic/claude-sonnet-4.5",
+      max_tokens: 400,
+      messages: [
+        { role: "system", content: GUARDIAN_SYSTEM },
+        { role: "user", content: user },
+      ],
+    }),
+  }).then((x) => x.json());
+  if (r.error) throw new Error(r.error.message ?? "openrouter error");
+  return r.choices?.[0]?.message?.content ?? "";
+}
+
+async function verdictFor(ctx) {
+  if (!anthropic && !OPENROUTER_API_KEY) return heuristicVerdict(ctx);
+  try {
+    const text = await llmText(ctx);
     const parsed = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
     if (typeof parsed.approve === "boolean" && typeof parsed.reason === "string") return parsed;
     throw new Error("bad shape");
