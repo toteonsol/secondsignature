@@ -1,0 +1,99 @@
+/* Second Signature: notary-desk aesthetic: ink, vellum, wax-seal red. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #1c1a17;
+  --ink-2: #3a362f;
+  --vellum: #f3ead9;
+  --vellum-2: #ece0c8;
+  --card: #faf4e7;
+  --line: #d8c9a8;
+  --seal: #a41f13;
+  --seal-soft: #f3d9d4;
+  --approve: #2e6b3f;
+  --approve-soft: #ddead9;
+  --dim: #7a705d;
+}
+
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--vellum);
+  background-image: radial-gradient(ellipse at 20% 0%, #fbf5e9 0%, var(--vellum) 55%, var(--vellum-2) 100%);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 1.55;
+}
+h1, h2, .balance { font-family: 'Fraunces', Georgia, serif; }
+
+.app { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; min-height: 100%; display: flex; flex-direction: column; gap: 20px; }
+
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.sigil { font-size: 30px; color: var(--seal); letter-spacing: -8px; margin-right: 6px; }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
+.tag { color: var(--dim); font-size: 12px; font-style: italic; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 12px; background: var(--card); }
+.pill.on { border-color: var(--approve); color: var(--approve); }
+.pill.off { border-color: var(--seal); color: var(--seal); }
+
+button {
+  font: inherit; cursor: pointer; border: 1.5px solid var(--ink); background: var(--ink); color: var(--vellum);
+  padding: 9px 16px; border-radius: 4px; transition: transform 0.05s ease;
+}
+button:hover:not(:disabled) { transform: translateY(-1px); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.ghost { background: transparent; color: var(--ink); }
+button.ghost.warn { border-color: var(--seal); color: var(--seal); }
+
+input {
+  font: inherit; width: 100%; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 4px;
+  background: #fffdf7; color: var(--ink); margin-top: 8px;
+}
+input:focus { outline: none; border-color: var(--ink); }
+
+.hero { max-width: 620px; margin: 8vh auto 0; text-align: center; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.hero h2 { font-size: 30px; line-height: 1.25; }
+.hero p { color: var(--ink-2); }
+
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+.col { display: flex; flex-direction: column; gap: 18px; }
+
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 6px; padding: 18px; box-shadow: 3px 3px 0 rgba(28, 26, 23, 0.08); }
+.label { text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; color: var(--dim); margin-bottom: 10px; }
+.balance { font-size: 40px; font-weight: 700; }
+.balance span { font-size: 16px; color: var(--dim); }
+
+.row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.row input { margin-top: 0; }
+.row.spread { justify-content: space-between; }
+.small { font-size: 12px; }
+.dim { color: var(--dim); }
+.mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; word-break: break-all; }
+a.mono { color: var(--ink-2); }
+
+.proposal { border-top: 1px dashed var(--line); padding: 10px 0; }
+.amt { font-weight: 500; }
+.status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line); }
+.status.s0 { border-color: var(--dim); color: var(--dim); }
+.status.s1 { border-color: var(--approve); color: var(--approve); background: var(--approve-soft); }
+.status.s2 { border-color: var(--seal); color: var(--seal); background: var(--seal-soft); }
+.status.s3 { color: var(--dim); }
+
+.feed { min-height: 200px; }
+.verdict { border-left: 3px solid var(--line); padding: 10px 12px; margin-bottom: 12px; background: #fffdf7; border-radius: 0 4px 4px 0; }
+.verdict.ok { border-left-color: var(--approve); }
+.verdict.no { border-left-color: var(--seal); }
+.verdict-head { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; margin-bottom: 6px; }
+.verdict.ok .verdict-head span:first-child { color: var(--approve); }
+.verdict.no .verdict-head span:first-child { color: var(--seal); }
+.speech { font-style: italic; color: var(--ink-2); }
+
+.deal { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.deal b { color: var(--ink); }
+
+footer { margin-top: auto; text-align: center; border-top: 1px solid var(--line); padding-top: 14px; }
