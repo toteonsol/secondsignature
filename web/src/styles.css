@@ -132,7 +132,16 @@ button:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
 .pill.on::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--approve); margin-right: 7px; animation: breathe 2.4s ease-in-out infinite; }
 @keyframes breathe { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
 .hero h2 { position: relative; }
-.hero h2::after { content: ''; display: block; width: 90px; height: 3px; background: var(--seal); margin: 18px auto 0; border-radius: 2px; }
+.cosign { width: 250px; height: 44px; margin: 6px auto 0; display: block; }
+.cosign path { fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.stroke-you { stroke: var(--ink); }
+.stroke-guardian { stroke: var(--seal); }
+@media (prefers-reduced-motion: no-preference) {
+  .cosign path { stroke-dasharray: 320; stroke-dashoffset: 320; }
+  .stroke-you { animation: signit 1.1s 0.5s cubic-bezier(0.3, 0, 0.2, 1) forwards; }
+  .stroke-guardian { animation: signit 0.9s 1.7s cubic-bezier(0.3, 0, 0.2, 1) forwards; }
+}
+@keyframes signit { to { stroke-dashoffset: 0; } }
 input, button, a { outline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--seal); }
 .balance { font-variant-numeric: tabular-nums; transition: opacity 0.3s ease; }
