@@ -293,6 +293,24 @@ export default function App() {
                 ) : (
                   <>
                     <p className="dim small">This is the heart of it: never sign alone, anywhere. On any dapp, choose WalletConnect, copy its pairing code, and paste it here. The vault becomes your wallet on that dapp, and nothing it asks for can execute until your guardian has read it. Scam mints and dressed-up drains die right here.</p>
+                    <div className="wc-guide">
+                      <svg viewBox="0 0 300 132" aria-label="Where to find the pairing code in a dapp's WalletConnect window">
+                        <rect x="60" y="6" width="180" height="120" rx="8" fill="#fffdf7" stroke="#d8c9a8" strokeWidth="1.5" />
+                        <text x="150" y="26" textAnchor="middle" fontSize="10" fill="#3a362f" fontFamily="inherit">Connect your wallet</text>
+                        <rect x="115" y="36" width="70" height="70" rx="4" fill="none" stroke="#3a362f" strokeWidth="1.5" />
+                        {[0,1,2,3,4,5].map((r) => [0,1,2,3,4,5].map((c) => ((r * 7 + c * 3) % 4 < 2) && (
+                          <rect key={`${r}-${c}`} x={121 + c * 10} y={42 + r * 10} width="7" height="7" fill="#3a362f" />
+                        )))}
+                        <g>
+                          <rect x="196" y="62" width="16" height="16" rx="3" fill="none" stroke="#3a362f" strokeWidth="1.5" />
+                          <rect x="200" y="58" width="16" height="16" rx="3" fill="#fffdf7" stroke="#3a362f" strokeWidth="1.5" />
+                          <circle cx="206" cy="68" r="15" fill="none" stroke="#a41f13" strokeWidth="2" strokeDasharray="3 3" />
+                          <path d="M222 68 C 244 68, 252 72, 262 84" fill="none" stroke="#a41f13" strokeWidth="1.5" />
+                          <text x="230" y="100" fontSize="9" fill="#a41f13" fontStyle="italic" fontFamily="inherit">this one</text>
+                        </g>
+                      </svg>
+                      <p className="dim small">The dapp's WalletConnect window shows a QR code. The pairing code hides behind the small copy icon beside it. Tap it, then paste below.</p>
+                    </div>
                     <div className="row">
                       <input placeholder="wc:…" value={wcUri} onChange={(e) => setWcUri(e.target.value)} />
                       <button disabled={!!busy || !wcUri.trim().startsWith("wc:")} onClick={pairDapp}>

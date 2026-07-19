@@ -157,3 +157,7 @@ input, button, a { outline-offset: 2px; }
 .acct { display: inline-flex; align-items: center; gap: 8px; }
 .linky { border: none; background: none; box-shadow: none; padding: 0; color: var(--seal); font-size: 11px; text-decoration: underline; cursor: pointer; }
 .linky:hover:not(:disabled) { transform: none; }
+
+.wc-guide { margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 6px; background: #fffdf7; }
+.wc-guide svg { display: block; width: 100%; max-width: 300px; margin: 0 auto; }
+.wc-guide p { margin-top: 6px; text-align: center; }
