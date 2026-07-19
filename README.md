@@ -2,7 +2,7 @@
 
 **The wallet that argues back.**
 
-Live app: https://secondsignature.vercel.app
+Live app: https://secondsignature.web3wikis.com
 Factory on Monad mainnet: [`0x8c58EdE67E93e15e371cFbd3C0b197c4971C2db2`](https://monadscan.com/address/0x8c58EdE67E93e15e371cFbd3C0b197c4971C2db2)
 Guardian agent: https://secondsignature-production.up.railway.app/health
 

@@ -18,8 +18,8 @@ export async function initWalletKit() {
     metadata: {
       name: "Second Signature",
       description: "The wallet that argues back",
-      url: "https://secondsignature.vercel.app",
-      icons: ["https://secondsignature.vercel.app/favicon.svg"],
+      url: "https://secondsignature.web3wikis.com",
+      icons: ["https://secondsignature.web3wikis.com/favicon.svg"],
     },
   });
   return kit;

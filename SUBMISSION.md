@@ -15,7 +15,7 @@ The biggest threat to a crypto wallet is its owner. One mistyped address, one si
 Second Signature gives your wallet a second pair of eyes with real authority but zero power to steal. Funds live in your own vault contract. Withdrawals are proposals: you sign first, then a guardian agent studies the destination's history, the amount against your balance, and the calldata, and it co-signs or objects in plain English. Its signature alone moves nothing, and it can never lock you out: any proposal can be pushed through by you alone after 48 hours, which is exactly the delay that defeats a thief holding your key. It also speaks WalletConnect, so the vault can be your wallet on any dapp with the guardian reviewing everything the dapp asks for.
 
 ## Project URL
-https://secondsignature.vercel.app
+https://secondsignature.web3wikis.com
 
 ## Github repo
 https://github.com/toteonsol/secondsignature
