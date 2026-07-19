@@ -201,7 +201,7 @@ export default function App() {
               <path className="stroke-you" d="M8 24 C 40 6, 62 38, 92 20 S 150 10, 168 22 C 180 30, 196 18, 210 22" />
               <path className="stroke-guardian" d="M22 36 C 60 24, 110 44, 158 32 S 228 26, 252 34" />
             </svg>
-            <p>
+            <p className="lead">
               Every wallet disaster starts the same way: one signature, made alone. The mistyped address. The scam
               dapp's drain dressed up as a mint. The cofounder who empties the treasury. Second Signature gives every
               transaction a second pair of eyes with a mind of its own: an AI co-signer on Monad that reads the
