@@ -165,14 +165,16 @@ export default function App() {
       {!account && (
         <>
           <section className="hero">
-            <h2>Give your crypto a guardian with a mind of its own.</h2>
+            <h2>Never sign alone again.</h2>
             <p>
-              Second Signature is a savings vault where an AI reviews every withdrawal before it can happen.
-              It reads the destination's history, the amount, the fine print you didn't. If something looks like
-              a drain, a scam, or a 3am mistake, your own wallet argues back, in plain English, before the money moves.
+              Every wallet disaster starts the same way: one signature, made alone. The mistyped address. The scam
+              dapp's drain dressed up as a mint. The cofounder who empties the treasury. Second Signature gives every
+              transaction a second pair of eyes with a mind of its own: an AI co-signer on Monad that reads the
+              destination's history, the contract you're really calling, and the fine print you didn't, then signs
+              with you or argues back in plain English, before the money moves.
             </p>
             <button onClick={connect}>Connect a wallet to begin</button>
-            <p className="dim small">Works with MetaMask and other browser wallets, on Monad mainnet.</p>
+            <p className="dim small">Works with MetaMask and other browser wallets, live on Monad mainnet.</p>
           </section>
 
           <section className="explain">
@@ -194,8 +196,12 @@ export default function App() {
               </ul>
             </div>
             <div className="card">
-              <div className="label">Use it everywhere</div>
-              <p>The vault speaks WalletConnect, the connect option built into most dapps. Pick WalletConnect on any dapp, paste the code here, and the vault becomes your wallet there. Even if the dapp turns out to be a scam, its requests hit your guardian before they can touch your money.</p>
+              <div className="label">Who needs a second signature</div>
+              <ul className="deal">
+                <li><b>Anyone who signs.</b> Connect any dapp through WalletConnect and the vault becomes your wallet there. If the dapp is a scam, its requests hit your guardian before they touch your money.</li>
+                <li><b>Anyone who mistypes.</b> Fat-fingered amounts and wrong addresses get caught while they are still reversible, which is to say: before.</li>
+                <li><b>Teams and projects.</b> Treasuries die of internal disputes. An incorruptible co-signer that answers to reasons, not politics, means no single person can drain the project in a bad week.</li>
+              </ul>
             </div>
           </section>
         </>
