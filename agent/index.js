@@ -54,6 +54,8 @@ const vaultCreatedEvent = parseAbiItem(
 const proposedEvent = parseAbiItem(
   "event Proposed(uint256 indexed id, address indexed to, uint256 value, bytes data)"
 );
+const approvedEvent = parseAbiItem("event Approved(uint256 indexed id, string reason)");
+const objectedEvent = parseAbiItem("event Objected(uint256 indexed id, string reason)");
 
 const vaults = new Set(); // vault addresses guarded by us
 const decisions = []; // in-memory log served to the frontend
@@ -209,6 +211,19 @@ async function bootstrap() {
       trackVaultLogs(await getLogsChunked(FACTORY_ADDRESS, vaultCreatedEvent, start, latest));
     }
     log(`bootstrapped: guarding ${vaults.size} vault(s)`);
+    // Rebuild the decision feed from on-chain events so restarts lose nothing.
+    if (vaults.size && BigInt(START_BLOCK) > 0n) {
+      const latest = await pub.getBlockNumber();
+      const addrs = [...vaults];
+      for (const [ev, approved] of [[approvedEvent, true], [objectedEvent, false]]) {
+        for (const l of await getLogsChunked(addrs, ev, BigInt(START_BLOCK), latest)) {
+          decisions.push({ vault: l.address, id: l.args.id.toString(), approved, reason: l.args.reason, tx: l.transactionHash, at: 0 });
+          handled.add(`${l.address}:${l.args.id}`);
+        }
+      }
+      decisions.sort((a, b) => Number(a.id) - Number(b.id));
+      log(`restored ${decisions.length} past decision(s) from chain`);
+    }
     for (const vault of vaults) {
       const n = await pub.readContract({ address: vault, abi: vaultAbi, functionName: "proposalCount" });
       for (let i = 0n; i < n; i++) handleProposal(vault, i);
