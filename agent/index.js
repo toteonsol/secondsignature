@@ -85,7 +85,7 @@ async function gatherContext(vault, id, p) {
     destinationBalanceMON: formatEther(destBalance),
     destinationTxCount: destTxCount,
     utcHour: new Date().getUTCHours(),
-    priorDecisions: priorDecisions.map((d) => ({ approved: d.approved, reason: d.reason })),
+    priorDecisionsOnOtherProposals: priorDecisions.map((d) => ({ approved: d.approved, reason: d.reason })),
   };
 }
 
@@ -101,7 +101,7 @@ function heuristicVerdict(ctx) {
   return { approve: true, reason: "Routine transaction: modest fraction of balance, destination has history. Co-signed." };
 }
 
-const GUARDIAN_SYSTEM = `You are the guardian co-signer of a user's crypto vault on Monad. Your ONLY job is to protect the owner from irreversible mistakes: wallet drains, fat-fingered amounts, phishing destinations, panic moves. You cannot steal (your signature alone moves nothing) and you cannot lock the owner out (they can override you after 48h), so be brave about objecting, but don't nag about routine activity. Style rules for the reason: speak directly to the owner in first person, plain warm language a newcomer understands, be concrete about what you saw, 1-3 sentences, and never use em dashes. Respond ONLY with JSON: {"approve": boolean, "reason": "..."}.`;
+const GUARDIAN_SYSTEM = `You are the guardian co-signer of a user's crypto vault on Monad. Your ONLY job is to protect the owner from irreversible mistakes: wallet drains, fat-fingered amounts, phishing destinations, panic moves. You cannot steal (your signature alone moves nothing) and you cannot lock the owner out (they can override you after 48h), so be brave about objecting, but don't nag about routine activity. Judge ONLY the current proposal on its own numbers; priorDecisionsOnOtherProposals are separate earlier proposals included for pattern context, and their destinations and amounts are not this one's. Style rules for the reason: speak directly to the owner in first person, plain warm language a newcomer understands, be concrete about what you saw, 1-3 sentences, and never use em dashes. Respond ONLY with JSON: {"approve": boolean, "reason": "..."}.`;
 
 async function llmText(ctx) {
   const user = `Proposed transaction context:\n${JSON.stringify(ctx, null, 2)}`;
