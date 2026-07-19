@@ -182,3 +182,7 @@ input, button, a { outline-offset: 2px; }
 .inlineverdict.ok .vtag { color: var(--approve); }
 .inlineverdict.no .vtag { color: var(--seal); }
 .vreason { font-style: italic; color: var(--ink-2); font-size: 13px; }
+
+.verify { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 8px; }
+.verify a { color: var(--seal); text-decoration: underline; }
+.verify .sep { color: var(--dim); }

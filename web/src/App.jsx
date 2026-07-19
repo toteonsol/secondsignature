@@ -454,7 +454,15 @@ export default function App() {
       )}
 
       <footer className="dim small">
-        Second Signature · guardian-co-signed vaults on Monad · self-custodial by construction
+        <div className="verify">
+          <span>Don't trust, verify:</span>
+          <a href="https://github.com/toteonsol/secondsignature" target="_blank" rel="noreferrer">open-source code</a>
+          <span className="sep">·</span>
+          <a href={`${EXPLORER}/address/${FACTORY_ADDRESS}`} target="_blank" rel="noreferrer">verified contract</a>
+          <span className="sep">·</span>
+          <a href={`${EXPLORER}/address/${FACTORY_ADDRESS}`} target="_blank" rel="noreferrer">every verdict on-chain</a>
+        </div>
+        <div>Second Signature · guardian-co-signed vaults on Monad · self-custodial by construction. Your keys and funds never touch our servers.</div>
       </footer>
     </div>
   );
