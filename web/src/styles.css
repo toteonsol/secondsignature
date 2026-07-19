@@ -153,3 +153,7 @@ input, button, a { outline-offset: 2px; }
 .ledger { max-width: 720px; margin: 34px auto 0; text-align: center; padding: 26px 28px; background: var(--card); border: 1.5px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 rgba(28, 26, 23, 0.08); }
 .bigquote { font-family: 'Fraunces', Georgia, serif; font-size: 21px; line-height: 1.45; color: var(--ink); margin: 12px 0 14px; font-style: italic; }
 @media (prefers-reduced-motion: no-preference) { .ledger { animation: rise 0.6s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; } }
+
+.acct { display: inline-flex; align-items: center; gap: 8px; }
+.linky { border: none; background: none; box-shadow: none; padding: 0; color: var(--seal); font-size: 11px; text-decoration: underline; cursor: pointer; }
+.linky:hover:not(:disabled) { transform: none; }

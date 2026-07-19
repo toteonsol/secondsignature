@@ -149,6 +149,16 @@ export default function App() {
     }
   };
 
+  const disconnectWallet = async () => {
+    await disconnectAll().catch(() => {});
+    setWcSession(null);
+    setAccount(null);
+    setWallet(null);
+    setVault(null);
+    setProposals([]);
+    setDecisions([]);
+  };
+
   const unpairDapps = async () => {
     await disconnectAll();
     setWcSession(null);
@@ -172,7 +182,14 @@ export default function App() {
           <span className={`pill ${guardianOnline ? "on" : "off"}`}>
             {guardianOnline ? `guardian ${short(guardianOnline)} · online` : "guardian offline"}
           </span>
-          {account ? <span className="pill">{short(account)}</span> : <button onClick={connect}>Connect wallet</button>}
+          {account ? (
+            <span className="pill acct">
+              {short(account)}
+              <button className="linky" title="Disconnect this wallet from the app" onClick={disconnectWallet}>disconnect</button>
+            </span>
+          ) : (
+            <button onClick={connect}>Connect wallet</button>
+          )}
         </div>
       </header>
 
