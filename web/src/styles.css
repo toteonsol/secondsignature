@@ -168,3 +168,17 @@ input, button, a { outline-offset: 2px; }
 .vaultbar button { font-size: 12px; padding: 6px 12px; }
 
 .walletbal { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+
+.reviewing { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; font-style: italic; color: var(--ink-2); }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--seal); display: inline-block; animation: think 1s ease-in-out infinite; }
+.dots i:nth-child(2) { animation-delay: 0.15s; }
+.dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes think { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-2px); } }
+.inlineverdict { margin-top: 8px; padding: 8px 10px; border-radius: 0 4px 4px 0; background: #fffdf7; border-left: 3px solid var(--line); }
+.inlineverdict.ok { border-left-color: var(--approve); }
+.inlineverdict.no { border-left-color: var(--seal); }
+.vtag { display: block; font-size: 11px; font-weight: 500; margin-bottom: 3px; }
+.inlineverdict.ok .vtag { color: var(--approve); }
+.inlineverdict.no .vtag { color: var(--seal); }
+.vreason { font-style: italic; color: var(--ink-2); font-size: 13px; }

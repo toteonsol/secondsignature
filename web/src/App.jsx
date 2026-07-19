@@ -386,13 +386,28 @@ export default function App() {
             <div className="card">
               <div className="label">Proposals</div>
               {proposals.length === 0 && <p className="dim">Nothing yet. Propose a withdrawal above and it appears here with the guardian's verdict beside it. Approved ones execute on their own; rejected ones wait for your cancel or your 48 hour override.</p>}
-              {proposals.map((p) => (
+              {proposals.map((p) => {
+                const d = decisionFor(p.id);
+                const reviewing = p.status === 0 && !d;
+                return (
                 <div key={p.id} className={`proposal s${p.status}`}>
                   <div className="row spread">
                     <span className="mono">#{p.id} → {short(p.to)}</span>
                     <span className="amt">{formatEther(p.value)} MON</span>
                     <span className={`status s${p.status}`}>{STATUS[p.status]}</span>
                   </div>
+                  {reviewing && (
+                    <div className="reviewing">
+                      <span className="dots"><i></i><i></i><i></i></span>
+                      The guardian is reading this transaction…
+                    </div>
+                  )}
+                  {d && (
+                    <div className={`inlineverdict ${d.approved ? "ok" : "no"}`}>
+                      <span className="vtag">{d.approved ? "✓ Co-signed" : "✋ Objection"}</span>
+                      <span className="vreason">“{d.reason}”</span>
+                    </div>
+                  )}
                   {(p.status === 0 || p.status === 2) && (
                     <div className="row">
                       <button className="ghost" disabled={!!busy} onClick={() => act("cancel", p.id)}>Cancel</button>
@@ -403,7 +418,7 @@ export default function App() {
                     </div>
                   )}
                 </div>
-              ))}
+              );})}
             </div>
           </section>
 
