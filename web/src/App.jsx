@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPublicClient, createWalletClient, custom, formatEther, parseEther, http as viemHttp } from "viem";
 import { chain, factoryAbi, vaultAbi, FACTORY_ADDRESS, AGENT_URL, EXPLORER, STATUS } from "./chain.js";
+import { connectDapp, disconnectAll, WC_PROJECT_ID } from "./walletconnect.js";
 
 const pub = createPublicClient({ chain, transport: viemHttp() });
 
@@ -16,6 +17,9 @@ export default function App() {
   const [busy, setBusy] = useState("");
   const [form, setForm] = useState({ to: "", amount: "" });
   const [deposit, setDeposit] = useState("");
+  const [wcUri, setWcUri] = useState("");
+  const [wcSession, setWcSession] = useState(null);
+  const [wcNote, setWcNote] = useState("");
 
   const [wallet, setWallet] = useState(null);
 
@@ -99,6 +103,44 @@ export default function App() {
 
   const act = (fn, id) => tx(`${fn}${id}`, () => wallet.writeContract({ account, address: vault, abi: vaultAbi, functionName: fn, args: [BigInt(id)] }));
 
+  const pairDapp = async () => {
+    setBusy("wc");
+    setWcNote("");
+    try {
+      await connectDapp(wcUri.trim(), vault, {
+        onSession: (s) => {
+          setWcSession(s.peer?.metadata?.name ?? "dapp");
+          setWcNote(`Connected. Everything ${s.peer?.metadata?.name ?? "this dapp"} asks for now goes past your guardian first.`);
+        },
+        onError: (m) => setWcNote(m),
+        onTransaction: async (dappTx) => {
+          const hash = await wallet.writeContract({
+            account,
+            address: vault,
+            abi: vaultAbi,
+            functionName: "propose",
+            args: [dappTx.to, BigInt(dappTx.value ?? 0), dappTx.data ?? "0x"],
+          });
+          await pub.waitForTransactionReceipt({ hash });
+          setWcNote("The dapp's request is in your proposals queue. It executes once the guardian co-signs.");
+          refresh();
+          return hash;
+        },
+      });
+      setWcUri("");
+    } catch (e) {
+      setWcNote(e.shortMessage ?? e.message);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const unpairDapps = async () => {
+    await disconnectAll();
+    setWcSession(null);
+    setWcNote("Disconnected.");
+  };
+
   const decisionFor = (id) => decisions.find((d) => Number(d.id) === id);
   const overrideReady = (p) => Date.now() / 1000 > p.proposedAt + 48 * 3600;
 
@@ -163,6 +205,29 @@ export default function App() {
               </div>
               <p className="dim small">Your signature is the first one. The guardian looks at the details and decides whether to add the second.</p>
             </div>
+
+            {WC_PROJECT_ID && (
+              <div className="card">
+                <div className="label">Use your vault on any dapp <span className="beta">beta</span></div>
+                {wcSession ? (
+                  <div className="row spread">
+                    <span>Connected to <b>{wcSession}</b></span>
+                    <button className="ghost" onClick={unpairDapps}>Disconnect</button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="dim small">On the dapp, choose WalletConnect and copy its pairing code, then paste it here. The vault becomes your wallet there, guardian included.</p>
+                    <div className="row">
+                      <input placeholder="wc:…" value={wcUri} onChange={(e) => setWcUri(e.target.value)} />
+                      <button disabled={!!busy || !wcUri.trim().startsWith("wc:")} onClick={pairDapp}>
+                        {busy === "wc" ? "Pairing…" : "Connect"}
+                      </button>
+                    </div>
+                  </>
+                )}
+                {wcNote && <p className="small note">{wcNote}</p>}
+              </div>
+            )}
 
             <div className="card">
               <div className="label">Proposals</div>

@@ -2,6 +2,10 @@
 
 **The wallet that argues back.**
 
+Live app: https://secondsignature.vercel.app
+Factory on Monad mainnet: [`0x8c58EdE67E93e15e371cFbd3C0b197c4971C2db2`](https://monadscan.com/address/0x8c58EdE67E93e15e371cFbd3C0b197c4971C2db2)
+Guardian agent: https://secondsignature-production.up.railway.app/health
+
 Second Signature is a self-custodial vault on Monad where every withdrawal needs two signatures: yours, and an AI guardian's. The guardian's only job is to protect you from irreversible mistakes: drains, fat-fingered amounts, phishing destinations, 3am panic moves. It reviews every proposed transaction against live on-chain context and either co-signs or objects, and its reasoning is stored on-chain with the decision.
 
 ## The problem
@@ -18,6 +22,10 @@ A two-of-two vault where the second signer is an AI agent with a very specific d
 - Swapping the guardian is also timelocked, so a stolen key can't just replace the guardian and drain.
 
 One hosted guardian serves every vault. Nobody needs to run anything.
+
+## Use it on any dapp (beta)
+
+The vault speaks WalletConnect. On any dapp, pick WalletConnect, paste the pairing code into Second Signature, and the vault becomes your wallet there. Every transaction the dapp requests lands in your proposals queue and executes only after the guardian co-signs. Why it matters: the classic wallet drain is a dapp asking for a signature you did not understand, and now something is reading it before it can hurt you.
 
 ## Architecture
 
