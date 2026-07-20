@@ -235,3 +235,5 @@ input, button, a { outline-offset: 2px; }
   box-shadow: 2px 2px 0 rgba(28,26,23,0.25); }
 
 .wcbtn { font-size: 13px; padding: 8px 14px; }
+
+.wclink { font-size: 12px; }

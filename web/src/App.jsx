@@ -24,6 +24,7 @@ export default function App() {
   const [wcNote, setWcNote] = useState("");
   const [landing, setLanding] = useState({ vaults: null, verdicts: null, quote: null });
   const [walletHelp, setWalletHelp] = useState(false);
+  const [hasInjected, setHasInjected] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -88,6 +89,7 @@ export default function App() {
   // Silently restore an already-authorized wallet on load, and follow account changes.
   useEffect(() => {
     if (!window.ethereum) return;
+    setHasInjected(true);
     window.ethereum.request({ method: "eth_accounts" }).then((accts) => {
       if (accts?.length) {
         setWallet(createWalletClient({ chain, transport: custom(window.ethereum) }));
@@ -272,9 +274,9 @@ export default function App() {
             </p>
             <button onClick={connect}>Connect a wallet to begin</button>
             <p className="dim small">Your first vault takes about thirty seconds and costs nothing but gas. Works with MetaMask and other browser wallets, live on Monad mainnet.</p>
-            {WC_PROJECT_ID && (
-              <button className="ghost wcbtn" disabled={!!busy} onClick={connectWC}>
-                {busy === "connect" ? "Opening your wallet…" : "Connect with MetaMask, Rabby or any mobile wallet"}
+            {WC_PROJECT_ID && hasInjected && (
+              <button className="linky wclink" disabled={!!busy} onClick={connectWC}>
+                {busy === "connect" ? "Opening your wallet…" : "or connect a wallet on your phone"}
               </button>
             )}
             {walletHelp && (
