@@ -23,6 +23,7 @@ export default function App() {
   const [wcSession, setWcSession] = useState(null);
   const [wcNote, setWcNote] = useState("");
   const [landing, setLanding] = useState({ vaults: null, verdicts: null, quote: null });
+  const [walletHelp, setWalletHelp] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -39,8 +40,40 @@ export default function App() {
 
   const [wallet, setWallet] = useState(null);
 
+  // Connect any mobile or desktop wallet over WalletConnect: opens the wallet
+  // app directly on a phone, or shows a QR code to scan from a desktop browser.
+  const connectWC = async () => {
+    if (!WC_PROJECT_ID) return setWalletHelp(true);
+    setBusy("connect");
+    try {
+      const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+      const provider = await EthereumProvider.init({
+        projectId: WC_PROJECT_ID,
+        chains: [chain.id],
+        showQrModal: true,
+        metadata: {
+          name: "Second Signature",
+          description: "The wallet that argues back",
+          url: window.location.origin,
+          icons: [`${window.location.origin}/favicon.svg`],
+        },
+      });
+      await provider.enable();
+      if (!provider.accounts?.length) throw new Error("No account was shared by the wallet.");
+      setWallet(createWalletClient({ chain, transport: custom(provider) }));
+      setAccount(provider.accounts[0]);
+      setWalletHelp(false);
+      provider.on("accountsChanged", (a) => (a?.length ? setAccount(a[0]) : (setAccount(null), setVault(null))));
+      provider.on("disconnect", () => { setAccount(null); setVault(null); });
+    } catch (e) {
+      if (!/user rejected|closed modal/i.test(e.message ?? "")) alert(e.shortMessage ?? e.message);
+    } finally {
+      setBusy("");
+    }
+  };
+
   const connect = async () => {
-    if (!window.ethereum) return alert("No wallet found. Install MetaMask (or any injected wallet).");
+    if (!window.ethereum) return connectWC();
     const w = createWalletClient({ chain, transport: custom(window.ethereum) });
     setWallet(w);
     const [addr] = await w.requestAddresses();
@@ -239,6 +272,14 @@ export default function App() {
             </p>
             <button onClick={connect}>Connect a wallet to begin</button>
             <p className="dim small">Your first vault takes about thirty seconds and costs nothing but gas. Works with MetaMask and other browser wallets, live on Monad mainnet.</p>
+            {WC_PROJECT_ID && (
+              <button className="ghost wcbtn" disabled={!!busy} onClick={connectWC}>
+                {busy === "connect" ? "Opening your wallet…" : "Connect with MetaMask, Rabby or any mobile wallet"}
+              </button>
+            )}
+            {walletHelp && (
+              <p className="small note">Install MetaMask or any browser wallet extension, then reload this page.</p>
+            )}
             {landing.vaults !== null && (
               <div className="stats">
                 <span><b>{landing.vaults}</b> vault{landing.vaults === 1 ? "" : "s"} guarded on Monad mainnet</span>

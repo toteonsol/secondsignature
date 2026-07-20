@@ -227,3 +227,11 @@ input, button, a { outline-offset: 2px; }
 @media (max-width: 640px) {
   .explain { grid-template-columns: 1fr; }
 }
+
+.wallethelp { text-align: left; max-width: 460px; margin-top: 6px; }
+.wallethelp p { margin-bottom: 10px; }
+.btnlink { display: inline-block; background: var(--ink); color: var(--vellum); text-decoration: none;
+  padding: 10px 16px; border-radius: 4px; border: 1.5px solid var(--ink); font-size: 13px; margin-bottom: 10px;
+  box-shadow: 2px 2px 0 rgba(28,26,23,0.25); }
+
+.wcbtn { font-size: 13px; padding: 8px 14px; }
